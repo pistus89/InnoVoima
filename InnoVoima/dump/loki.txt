@@ -1,0 +1,6 @@
+.show
+.derpa
+.limit 10
+.insult
+.limit 10
+.quit
