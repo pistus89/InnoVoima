@@ -85,10 +85,6 @@ public class MyBot extends PircBot {
         this.allowWrite = true;
         this.male = new HashMap<>();
 
-
-
-
-
     }
 
     public void setTranslation(String channel) {

@@ -144,14 +144,11 @@ public class Main {
          
         
         bot.addShouts(shouts); // adds shouts that were collected from files
+        shouts = null; //marks the lists for carbage collector so it releases memory
         bot.addJMegaHal(loki);
+        loki = null;
         bot.addJMegaHal(sitaatit);
-        loki = null; //marks the lists for carbage collector so it releases memory
-        shouts = null;
         sitaatit = null;
-        
-        
-        
         
         
         System.out.println("done");
