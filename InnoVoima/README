@@ -1,0 +1,15 @@
+INNOVOIMA - the java-based irc bot build with pircbot-library
+
+Beware!
+
+Before you launch the bot, make sure it contains every library that is 
+added with it. The conversation memory needs three txt-file which you 
+have to create by yourself:
+
+loki.txt    - collects every line that is spoken in default channel
+Sitaatit.txt - random text that InnoVoima adds on launch in it's memory
+Shouts.txt - file to collect all the commands that are made by users
+
+Then MAKE SURE you register your own Microsoft Bing translator API- and 
+LASTFM API -codes and add them in MyBot.java -file (inside methods .lastfm
+and .tr) otherwise outcomment the .lastfm and .tr methods

@@ -1,6 +1,7 @@
-package InnoVoima;
+package com.pircbot.innovoima;
 /*
  * To change this template, choose Tools | Templates
+
  * and open the template in the editor.
  */
 
@@ -14,17 +15,26 @@ package InnoVoima;
  * - set correct channel on this.defaultChannel
  * - set correct API-keys on lastFM() and translate() -methods
  */
-@author Krister Holmström
-
+/**
+ * 
+ */
+/*
+ * 
+ */
 import com.memetix.mst.language.Language;
 import com.memetix.mst.translate.Translate;
+
 import de.umass.lastfm.*;
-import de.umass.lastfm.Track;
 import de.umass.lastfm.User;
+
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
 import org.jibble.pircbot.*;
 import org.jibble.jmegahal.*;
+
 import java.io.*;
 import java.util.ArrayList;
 import java.util.Random;
@@ -32,11 +42,13 @@ import java.net.*;
 import java.util.Collection;
 import java.util.GregorianCalendar;
 import java.util.HashMap;
+
 import org.joda.time.Period;
 
 public class MyBot extends PircBot {
 
     private JMegaHal jmegahal;
+    private PrintWriter notes;
     private PrintWriter writer;
     private PrintWriter shout;
     private ArrayList<String> Op;
@@ -59,33 +71,36 @@ public class MyBot extends PircBot {
     private HashMap<String, GregorianCalendar> lastLog;
     private HashMap<String, Integer> soberTime;
     private HashMap<String, Boolean> male;
-    private int loglength;
+    private ArrayList<String> titleExtract;
+    
     
 
     public MyBot() throws FileNotFoundException, URISyntaxException {
         this.setName("InnoVoima");
         this.jmegahal = new JMegaHal();
-        this.writer = new PrintWriter("loki.txt"); //add here the exact location of file loki.txt
-        this.shout = new PrintWriter("shout.txt"); //add here the exact location of file shout.txt
-        this.defaultChannel = ""; // add here the first channel in which the bot will join
-        this.Op = new ArrayList<>();
-        this.insult = new HashMap<>();
+        this.notes = new PrintWriter("dump/notes.txt"); //add here the exact location of file notes.txt
+        this.writer = new PrintWriter("dump/loki.txt"); //add here the exact location of file loki.txt
+        this.shout = new PrintWriter("dump/shout.txt"); //add here the exact location of file shout.txt
+        this.defaultChannel = "#tn1pe-2012s2"; // add here the first channel in which the bot will join
+        this.Op = new ArrayList<String>();
+        this.insult = new HashMap<String, Boolean>();
         this.master = "";
-        this.insultList = new ArrayList<>();
+        this.insultList = new ArrayList<String>();
         this.random = new Random();
-        this.kielet = new HashMap<>();
-        this.shouts = new HashMap<>();
-        this.painot = new HashMap<>();
+        this.kielet = new HashMap<String, String>();
+        this.shouts = new HashMap<String, String>();
+        this.painot = new HashMap<String, Double>();
         this.shoutLineLimit = 10;
         this.bottiLista = Main.rajapinta.list;
-        this.translation = new HashMap<>();
+        this.translation = new HashMap<String, Boolean>();
         this.insult.put(defaultChannel, false);
         this.die = false;
-        this.alcoholGrams = new HashMap<>();
-        this.lastLog = new HashMap<>();
-        this.soberTime = new HashMap<>();
+        this.alcoholGrams = new HashMap<String, Double>();
+        this.lastLog = new HashMap<String, GregorianCalendar>();
+        this.soberTime = new HashMap<String, Integer>();
         this.allowWrite = true;
-        this.male = new HashMap<>();
+        this.male = new HashMap<String, Boolean>();
+        this.titleExtract = new ArrayList<String>();
 
     }
 
@@ -93,7 +108,7 @@ public class MyBot extends PircBot {
         this.translation.put(channel, true);
     }
 
-    public void setWriter() {
+    public void setWriter() { 
         this.allowWrite = true;
     }
 
@@ -142,15 +157,18 @@ public class MyBot extends PircBot {
         }
 
     }
+    public void addJMegahalLine(String line) {
+    	this.jmegahal.add(line);
+    }
 
     public void addJMegaHal(String[] sentence) {
-    	this.
-    	int i = 0;
-        while (i < sentence.length - 1) {
-            jmegahal.add(sentence[i]);
-            
-            i++;
-        }
+    	
+    		int i = 0;
+        	while (i < sentence.length - 1) {
+        		jmegahal.add(sentence[i]);
+            	i++;
+        	}
+    	
     }
 
     public void setModerated(String channel) {
@@ -198,7 +216,19 @@ public class MyBot extends PircBot {
             sendMessage(sender, "  .choose <option1>|<option2> = give me some options and I choose for you. I.e. .choose me|you");
             sendMessage(sender, "  .alko  = pre mill calculator! You'll get more info by using this command");
 
+        } else if(message.startsWith(".title")) {
+        	if (sender.equals(this.master)) {
+        		sendMessage(channel, allowTitles(channel));
+        	} else {
+        		sendMessage(channel, sender + ": " + insult(channel));
+        	}
+        } else if (message.startsWith(".note")){
+        	String line = message.substring(0, message.indexOf(" "));
+        	this.notes.println(line);
+        	this.notes.flush();
+        	sendMessage(channel, "note added");
         } else if (message.startsWith(".insult") && sender.equals(this.master)) {
+        
 
             if (!this.insult.get(channel)) {
                 this.insult.remove(channel);
@@ -257,7 +287,7 @@ public class MyBot extends PircBot {
             sendMessage(channel, Colors.WHITE + s + s + s + Colors.BLUE + "  " + Colors.WHITE + "     ");
             sendMessage(channel, Colors.BLUE + "          ");
             sendMessage(channel, Colors.WHITE + "   " + Colors.BLUE + "  " + Colors.WHITE + "     ");
-
+        	
         } else if (message.startsWith(".exit")) {
 
             if (sender.equalsIgnoreCase((this.master))) {
@@ -299,7 +329,7 @@ public class MyBot extends PircBot {
             String time = new java.util.Date().toString();
             sendMessage(channel, sender + ": The time is now " + time);
 
-        } else if (message.startsWith(".op ")) { //user can promote Operator via bot
+        } else if (message.startsWith(".op ")) { //user can promote Operator via using bot
 
             if (sender.equalsIgnoreCase(this.master)) {
                 String nick = message.toString().replaceAll(".op ", "");
@@ -348,9 +378,15 @@ public class MyBot extends PircBot {
                 sendMessage(channel, sender + ": " + insult(channel));
             }
 
-        } else if (message.contains("http:") || message.startsWith("https:")) {
+        } else if ((message.contains("http") || message.contains("www")) && this.titleExtract.contains(channel)) {
             try {
-                sendMessage(channel, TitleExtractor.getPageTitle(message.toString()));
+            	ArrayList<String> list = parseLinks(message);
+            	for (String url : list) {
+            		if(url.startsWith("www")) {
+            			url = "http://" + url;
+            		}
+            		sendMessage(channel, TitleExtractor.getPageTitle(url));
+            	}
             } catch (IOException ex) {
                 Logger.getLogger(MyBot.class.getName()).log(Level.SEVERE, null, ex);
             }
@@ -362,7 +398,7 @@ public class MyBot extends PircBot {
 
         } else if (message.startsWith(".tr ")) {
 
-            ArrayList<String> list = new ArrayList<>();
+            ArrayList<String> list = new ArrayList<String>();
 
             String keyWords = message.toString().replaceAll(".tr ", "");  // These lines will parse the language codes from the message
             int place = keyWords.indexOf(" ");
@@ -491,36 +527,22 @@ public class MyBot extends PircBot {
             String gender = message.replace(".addgender ", "");
             int size = this.male.size();
 
-            switch (gender) {
-                case "male":
-                    this.male.put(sender, true);
-                    break;
-                case "female":
-                    this.male.put(sender, false);
-                    break;
-                case "mies":
-                    this.male.put(sender, true);
-                    break;
-                case "nainen":
-                    this.male.put(sender, false);
-                    break;
-                case "jonne":
-                    this.male.put(sender, true);
-                    break;
-                case "jonna":
-                    this.male.put(sender, false);
-                    break;
-                case "poika":
-                    this.male.put(sender, true);
-                    break;
-                case "tyttö":
-                    this.male.put(sender, false);
-                    break;
-                case "boy":
-                    this.male.put(sender, true);
-                    break;
-                case "girl":
-                    this.male.put(sender, false);
+            if (gender.equals("male")) {
+            	this.male.put(sender, true);
+            } else if (gender.equals("female")) {
+            	this.male.put(sender, false);
+            } else if (gender.equals("mies")) {
+            	this.male.put(sender, true);
+            } else if (gender.equals("nainen")) {
+            	this.male.put(sender, false);
+            } else if (gender.equals("jonne")) {
+            	this.male.put(sender, true);
+            } else if (gender.equals("jonna")) {
+            	this.male.put(sender, false);
+            } else if (gender.equals("poika")) {
+            	this.male.put(sender, true);
+            } else if (gender.equals("tyttö")) {
+            	this.male.put(sender, false);
             }
 
             if (this.male.size() > size) {
@@ -536,7 +558,7 @@ public class MyBot extends PircBot {
             this.shouts.remove(command);
             sendMessage(channel, "shout " + command + " removed succesfully");
 
-        } else if (message.startsWith(".shout ")) { // users in irssi can add their own commands by themselves 
+        } else if (message.startsWith(".shout ")) { // users in channel can add their own commands by themselves 
 
             String command = message.replace(".shout ", "");
             int border = command.trim().indexOf(" ");
@@ -644,15 +666,30 @@ public class MyBot extends PircBot {
                 reconnect();
                 this.joinChannel(this.defaultChannel);
 
-            } catch (IOException | IrcException ex) {
+            } catch (Exception ex) {
                 this.shout.close();
                 this.writer.close();
+                this.notes.close();
                 Logger.getLogger(MyBot.class.getName()).log(Level.FINE, null, ex);
-
+            } finally {
+            
+            	if (!this.isConnected()) {
+            		this.setName("InnoVoima");
+            		try {
+						reconnect();
+						this.joinChannel(this.defaultChannel);
+					} catch (Exception e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+            	}
+            
             }
+            
         } else {
             this.shout.close();
             this.writer.close();
+            this.notes.close();
         }
 
     }
@@ -777,32 +814,25 @@ public class MyBot extends PircBot {
         } else if (message.startsWith(".addgender")) { // user can give his/her gender for alcohol calculation
             String gender = message.replace(".addgender ", "");
             int size = this.male.size();
-
-            switch (gender) {
-                case "male":
-                    this.male.put(sender, true);
-                    break;
-                case "female":
-                    this.male.put(sender, false);
-                    break;
-                case "mies":
-                    this.male.put(sender, true);
-                    break;
-                case "nainen":
-                    this.male.put(sender, false);
-                    break;
-                case "jonne":
-                    this.male.put(sender, true);
-                    break;
-                case "jonna":
-                    this.male.put(sender, false);
-                    break;
-                case "poika":
-                    this.male.put(sender, true);
-                    break;
-                case "tyttö":
-                    this.male.put(sender, false);
+            
+            if (gender.equals("male")) {
+            	this.male.put(sender, true);
+            } else if (gender.equals("female")) {
+            	this.male.put(sender, false);
+            } else if (gender.equals("mies")) {
+            	this.male.put(sender, true);
+            } else if (gender.equals("nainen")) {
+            	this.male.put(sender, false);
+            } else if (gender.equals("jonne")) {
+            	this.male.put(sender, true);
+            } else if (gender.equals("jonna")) {
+            	this.male.put(sender, false);
+            } else if (gender.equals("poika")) {
+            	this.male.put(sender, true);
+            } else if (gender.equals("tyttö")) {
+            	this.male.put(sender, false);
             }
+            
 
             if (this.male.size() > size) {
                 sendMessage(sender, "gender added succesfully");
@@ -884,6 +914,16 @@ public class MyBot extends PircBot {
         this.kielet.put("cht", "CHINESE_TRADITIONAL");
 
     }
+    
+    public String allowTitles(String channel) {
+    	if (this.titleExtract.contains(channel)) {
+    		this.titleExtract.remove(channel);
+    		return "title extracting disabled";
+    	} else {
+    		this.titleExtract.add(channel);
+    		return "title extracting activated";
+    	}
+    }
 
     public String insult(String channel) {
         if (this.insult.containsKey(channel)) {
@@ -900,7 +940,7 @@ public class MyBot extends PircBot {
     public String lastFM(String nick) {
         Caller.getInstance().setUserAgent("tst");
 
-        String key = ""; //this is the key used in the Last.fm API examples
+        String key = "b8f878fb17a01969f564263e3cdba51c"; //this is the key used in the Last.fm API examples
         String palautus;
 
         Collection<Track> result = (User.getRecentTracks(nick, 1, 5, key).getPageResults());
@@ -1052,4 +1092,21 @@ public class MyBot extends PircBot {
 
 
     }
+    
+    public ArrayList<String> parseLinks(String text) {
+    	ArrayList<String> links = new ArrayList<String>();
+    	 
+    	String regex = "\\(?\\b(http://|www[.])[-A-Za-z0-9+&@#/%?=~_()|!:,.;]*[-A-Za-z0-9+&@#/%=~_()|]";
+    	Pattern p = Pattern.compile(regex);
+    	Matcher m = p.matcher(text);
+    	while(m.find()) {
+    	String urlStr = m.group();
+    	if (urlStr.startsWith("(") && urlStr.endsWith(")"))
+    	{
+    	urlStr = urlStr.substring(1, urlStr.length() - 1);
+    	}
+    	links.add(urlStr);
+    	}
+    	return links;
+    	}
 }

@@ -1,17 +1,23 @@
-package InnoVoima;
+package com.pircbot.innovoima;
 import java.net.URISyntaxException;
 import java.util.Scanner;
 import java.io.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
 import org.jibble.pircbot.IrcException;
 
-@author Krister Holmström
+
 //notelist to check before running the bot:
 //- exact locations of loki.txt, shout.txt and sitaatit.txt in Scanner objects
 //- master nick is set correctly on BOTH classes
 //- first server is set correctly in main-class
 //- first channel is set correctly in main-class
+
+/**
+*
+* @author Krister "Pistus" Holmström
+*/
 
 public class Main {
 
@@ -97,13 +103,42 @@ public class Main {
         }
     }
     
+    public static class logfile extends Thread {
+    	private String[] log;
+    	private int loglength;
+    	private MyBot bot;
+    	
+    	public void run() {
+    		while (loglength > 1) {
+    			String currentLine = log[loglength - 1];
+    			if (currentLine.isEmpty()) {
+    				currentLine = currentLine + " ";
+    			}
+    			this.bot.addJMegahalLine(currentLine);
+    			this.loglength--;
+    			try {
+					logfile.sleep(5000);
+				} catch (InterruptedException e) {
+					
+				}
+    		}
+    		System.out.println("logfile-säie valmis!");
+    	}
+    	
+    	public void addlog(String [] log, MyBot bot) {
+    		this.log = log;
+    		this.loglength = log.length;
+    		this.bot = bot;
+    	}
+    }
+    
    
     
-    public static void main(String[] args) throws Exception {
+    public static void main(String[] args) throws Exception  {
         
         //fullfill the locations of each file, for example /home/user/sitaatit.txt
         String[] sitaatit = new String[1];
-        Scanner inputFile1 = new Scanner(new FileInputStream("sitaatit.txt"));
+        Scanner inputFile1 = new Scanner(new FileInputStream("dump/sitaatit.txt"));
         
         while (inputFile1.hasNextLine()) {
             String line = inputFile1.nextLine();
@@ -113,7 +148,7 @@ public class Main {
         
         
         String[] shouts = new String[1];
-        Scanner inputFile3 = new Scanner(new FileInputStream("shout.txt"));
+        Scanner inputFile3 = new Scanner(new FileInputStream("dump/shout.txt"));
         
         while (inputFile3.hasNextLine()) {
             String line = inputFile3.nextLine();
@@ -122,7 +157,7 @@ public class Main {
         inputFile3.close();
         
         String[] loki = new String[1];
-        Scanner inputFile2 = new Scanner(new FileInputStream("loki.txt"));
+        Scanner inputFile2 = new Scanner(new FileInputStream("dump/loki.txt"));
         
         while (inputFile2.hasNextLine()) {
             String line = inputFile2.nextLine();
@@ -146,11 +181,12 @@ public class Main {
         
         bot.addShouts(shouts); // adds shouts that were collected from files
         shouts = null; //marks the lists for carbage collector so it releases memory
-        bot.addJMegaHal(loki);
-        loki = null;
         bot.addJMegaHal(sitaatit);
         sitaatit = null;
-        
+        logfile handler = new logfile(); //leaves adding the loki into Jmegahal for another Thread
+        handler.addlog(loki, bot);
+        handler.start();
+        loki = null;
         
         System.out.println("done");
         
@@ -163,17 +199,8 @@ public class Main {
         bot.joinChannel("#tn1pe-2012s2"); //add here the channel, where you want the irc bot to join in
         bot.saveChannels();
         bot.setWriter();
-        
-        
-        
-        
-        
         bot.setEncoding("UTF-8");
-        
-       
-        
-        
-        
+
     }
     
     public static String[] addLine(String line, String[] list) {

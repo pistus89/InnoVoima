@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<classpath>
+	<classpathentry kind="src" path="dump"/>
+	<classpathentry kind="src" path="src"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-1.6"/>
+	<classpathentry exported="true" kind="lib" path="pircbot.jar"/>
+	<classpathentry exported="true" kind="lib" path="JMegaHal.jar"/>
+	<classpathentry exported="true" kind="lib" path="joda-time-2.2.jar"/>
+	<classpathentry exported="true" kind="lib" path="microsoft-translator-java-api-0.6.1-jar-with-dependencies.jar"/>
+	<classpathentry exported="true" kind="lib" path="lastfm-java-0.1.2.jar"/>
+	<classpathentry kind="output" path="bin"/>
+</classpath>
