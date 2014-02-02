@@ -8,6 +8,7 @@ public class Lession {
 	private String code;
 	private Calendar starts;
 	private Calendar ends;
+	private String day;
 	private String studyField;
 	private String language;
 	private int ops;
@@ -21,7 +22,7 @@ public class Lession {
 	
 	public Lession (String name, String code, String studyField, String language, String teacher,
 			String campus, String programme, String group, String rooms, Calendar starts, 
-			Calendar ends, Calendar startDate, Calendar endDate, int ops) {
+			Calendar ends, Calendar startDate, Calendar endDate,String day, int ops) {
 		this.name = name;
 		this.code = code;
 		this.starts = starts;
@@ -36,11 +37,12 @@ public class Lession {
 		this.startDate = startDate;
 		this.endDate = endDate;
 		this.rooms = rooms;
+		this.day = day;
 	}
 	
 	public Lession () {
 		this("","","","","","","","","", new GregorianCalendar(), new GregorianCalendar(),
-				new GregorianCalendar(), new GregorianCalendar(), 0);
+				new GregorianCalendar(), new GregorianCalendar(),"", 0);
 	}
 
 	public String getName() {
@@ -65,6 +67,14 @@ public class Lession {
 
 	public void setStarts(Calendar starts) {
 		this.starts = starts;
+	}
+	
+	public String getDay() {
+		return this.day;
+	}
+	
+	public void setDay(String day) {
+		this.day = day;
 	}
 
 	public Calendar getEnds() {
