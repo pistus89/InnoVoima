@@ -1,13 +1,12 @@
 package com.pircbot.innovoima;
 
-import java.util.Calendar;
-import java.util.GregorianCalendar;
+import org.joda.time.DateTime;
 
 public class Lession {
 	private String name;
 	private String code;
-	private Calendar starts;
-	private Calendar ends;
+	private DateTime starts;
+	private DateTime ends;
 	private String day;
 	private String studyField;
 	private String language;
@@ -16,13 +15,13 @@ public class Lession {
 	private String campus;
 	private String programme;
 	private String group;
-	private Calendar startDate;
-	private Calendar endDate;
+	private DateTime startDate;
+	private DateTime endDate;
 	private String rooms;
 	
 	public Lession (String name, String code, String studyField, String language, String teacher,
-			String campus, String programme, String group, String rooms, Calendar starts, 
-			Calendar ends, Calendar startDate, Calendar endDate,String day, int ops) {
+			String campus, String programme, String group, String rooms, DateTime starts, 
+			DateTime ends, DateTime startDate, DateTime endDate,String day, int ops) {
 		this.name = name;
 		this.code = code;
 		this.starts = starts;
@@ -41,8 +40,8 @@ public class Lession {
 	}
 	
 	public Lession () {
-		this("","","","","","","","","", new GregorianCalendar(), new GregorianCalendar(),
-				new GregorianCalendar(), new GregorianCalendar(),"", 0);
+		this("","","","","","","","","", new DateTime(), new DateTime(),
+				new DateTime(), new DateTime(),"", 0);
 	}
 
 	public String getName() {
@@ -61,11 +60,11 @@ public class Lession {
 		this.code = code;
 	}
 
-	public Calendar getStarts() {
+	public DateTime getStarts() {
 		return starts;
 	}
 
-	public void setStarts(Calendar starts) {
+	public void setStarts(DateTime starts) {
 		this.starts = starts;
 	}
 	
@@ -77,11 +76,11 @@ public class Lession {
 		this.day = day;
 	}
 
-	public Calendar getEnds() {
+	public DateTime getEnds() {
 		return ends;
 	}
 
-	public void setEnds(Calendar ends) {
+	public void setEnds(DateTime ends) {
 		this.ends = ends;
 	}
 
@@ -141,19 +140,19 @@ public class Lession {
 		this.group = group;
 	}
 
-	public Calendar getStartDate() {
+	public DateTime getStartDate() {
 		return startDate;
 	}
 
-	public void setStartDate(Calendar startDate) {
+	public void setStartDate(DateTime startDate) {
 		this.startDate = startDate;
 	}
 
-	public Calendar getEndDate() {
+	public DateTime getEndDate() {
 		return endDate;
 	}
 
-	public void setEndDate(Calendar endDate) {
+	public void setEndDate(DateTime endDate) {
 		this.endDate = endDate;
 	}
 

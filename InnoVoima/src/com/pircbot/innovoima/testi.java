@@ -17,6 +17,7 @@ import java.util.Scanner;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import org.joda.time.DateTime;
 import org.joda.time.Period;
 
 import com.pircbot.*;
@@ -97,9 +98,9 @@ public class testi {
     	users.put("Pistus", courses);
     	Lession next = getNextLession("Pistus");
     	System.out.println("next class is " + next.getName() + ", room: " 
-    			+ next.getRooms() + ", length: " + next.getStarts().HOUR_OF_DAY
-    			+ ":" + next.getStarts().MINUTE + " - " + next.getEnds().HOUR_OF_DAY
-    			+ ":" + next.getEnds().MINUTE);
+    			+ next.getRooms() + ", length: " + next.getStarts().getHourOfDay()
+    			+ ":" + next.getStarts().getMinuteOfDay() + " - " + next.getEnds().getHourOfDay()
+    			+ ":" + next.getEnds().getMinuteOfDay());
 //        	try { 
 //			CsvReader schedule = new CsvReader("example.csv");
 //			schedule.readHeaders();
@@ -117,24 +118,18 @@ public class testi {
     	
     	
     	
-    
-    
     } 	
 	
-	
-    
-    public static Calendar saveClock(int hours, int minutes) {
-    	Calendar start = new GregorianCalendar();
-    	start.set(Calendar.HOUR_OF_DAY, hours);
-    	start.set(Calendar.MINUTE, minutes);
-    	System.out.println(start.HOUR_OF_DAY);
-    	
+    public static DateTime saveClock(int hours, int minutes) {
+    	DateTime start = new DateTime();
+    	start = start.withHourOfDay(hours);
+    	start = start.withMinuteOfHour(minutes);
     	return start;
     }
     
-    public static Calendar saveDate(int day, int month, int year) {
-    	Calendar start = new GregorianCalendar();
-    	start.set(year, month, day);
+    public static DateTime saveDate(int day, int month, int year) {
+    	DateTime start = new DateTime();
+    	start = start.withDate(year, month, day);
     	return start;
     }
     
@@ -156,9 +151,9 @@ public class testi {
     
     
     @SuppressWarnings("deprecation")
-	public static boolean compareDates(Calendar calendar, String day) {
-    	int firstHours = calendar.getTime().getHours();
-    	int firstMinutes = calendar.getTime().getHours();
+	public static boolean compareDates(DateTime time, String day) {
+    	int firstHours = time.getHourOfDay();
+    	int firstMinutes = time.getMinuteOfHour();
     	int secondHours = getCurrentDate().getTime().getHours();
     	int secondMinutes = getCurrentDate().getTime().getHours();
     	weekDays day1 = weekDays.getDayByString(day);
