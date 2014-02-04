@@ -163,5 +163,14 @@ public class Lession {
 	public void setRooms(String rooms) {
 		this.rooms = rooms;
 	}
+	@Override
+	public String toString() {
+		return "name: " + this.name + ", Code: " + this.code + ", room: " +this.rooms + ", For groups:" +
+				this.group + ", Classes: " + this.day + " " + this.starts.getHourOfDay() + ":" + 
+				this.starts.getMinuteOfHour() + " - " + this.ends.getHourOfDay() + ":" + this.ends.getMinuteOfDay() +
+				", period: " + this.startDate.getDayOfMonth() + "." + this.startDate.getMonthOfYear() + "." + this.startDate.getYear() + " - "
+				+ this.endDate.getDayOfMonth() + "." + this.endDate.getMonthOfYear() + ", Teacher: " + this.teacher + ", OP: " + this.ops + 
+				", Campus: " + this.campus + ", Programme: " + this.programme + ", Study Field: " + this.studyField + ", Language: " + this.language;
+	}
 
 }

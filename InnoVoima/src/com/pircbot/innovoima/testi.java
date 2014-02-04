@@ -92,15 +92,28 @@ public class testi {
     	lessions.put(englanti.getCode(),englanti);
     	
     	users = new HashMap<String,ArrayList<String>>();
-    	ArrayList<String> courses = new ArrayList<String>();
-    	courses.add("ICT4TN002-4");
-    	courses.add("ENG4TN003-7");
-    	users.put("Pistus", courses);
+    	boolean courseAdd = addCourse("Pistus", "SWE4TN003-6");
+    	
+    	if (courseAdd) {
+    		System.out.println("Course added successfully");
+    	}
+    	
     	Lession next = getNextLession("Pistus");
+    	int startM = next.getStarts().getMinuteOfHour();
+    	int endM = next.getEnds().getMinuteOfHour(); //for sfome unknown reason
+    	//it converts the hours in minutes as well. this if-sentence will takes
+    	//care that minutes will be displayed in correct format
+    	if (startM > 60 && endM > 60) {
+    		startM = startM - (next.getStarts().getHourOfDay() * 60);
+    		endM = endM - (next.getEnds().getHourOfDay() * 60);
+    	}
     	System.out.println("next class is " + next.getName() + ", room: " 
     			+ next.getRooms() + ", length: " + next.getStarts().getHourOfDay()
-    			+ ":" + next.getStarts().getMinuteOfDay() + " - " + next.getEnds().getHourOfDay()
-    			+ ":" + next.getEnds().getMinuteOfDay());
+    			+ ":" + startM + " - " + next.getEnds().getHourOfDay()
+    			+ ":" + endM);
+    	
+    	System.out.println(findCourse("ENG4TN003-7"));
+    	System.out.println(findCourse("eng4tn003-7"));
 //        	try { 
 //			CsvReader schedule = new CsvReader("example.csv");
 //			schedule.readHeaders();
@@ -115,10 +128,30 @@ public class testi {
 //		} catch (IOException e) {
 //			e.printStackTrace();
 //		}
-    	
-    	
-    	
+    	  	
     } 	
+	public static String findCourse(String course) {
+		Lession lession = lessions.get(course);
+		if (lession == null) {
+			return "couldn't find the course " + course;
+		} else {
+			return lession.toString();
+		}
+	}
+	public static boolean addCourse(String user, String course) {
+		ArrayList<String> courses;
+		if (users.containsKey(user)) {
+			courses = users.get(user);
+		} else {
+			courses = new ArrayList<String>();
+		}
+    	if(lessions.containsKey(course)) {
+    		courses.add(course);
+    		users.put(user, courses);
+    		return true;
+    	}
+    	return false;
+	}
 	
     public static DateTime saveClock(int hours, int minutes) {
     	DateTime start = new DateTime();
